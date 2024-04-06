@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Text Editor</title>
+    <style>
+      #editor {
+        width: 100%;
+        height: 300px;
+        border: 1px solid black;
+        padding: 5px;
+        overflow-y: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="bold">Bold</button>
+    <button id="italic">Italic</button>
+    <button id="undo">Undo</button>
+    <button id="redo">Redo</button>
+    <div id="editor" contenteditable="true"></div>
+    <div id="range-info">Selected Range:</div>
+
+    <script>
+      const boldButton = document.getElementById("bold");
+      const italicButton = document.getElementById("italic");
+      const editor = document.getElementById("editor");
+      const rangeInfo = document.getElementById("range-info");
+      const undoButton = document.getElementById("undo");
+      const redoButton = document.getElementById("redo");
+      let undoStack = [];
+      let redoStack = [];
+      let currentContent = editor.innerHTML;
+
+      boldButton.addEventListener("click", () => {
+        makeSelectedTextBold();
+      });
+
+      italicButton.addEventListener("click", () => {
+        toggleItalic();
+      });
+
+      editor.addEventListener("input", () => {
+        saveState();
+      });
+
+      editor.addEventListener("keydown", () => {
+        saveState();
+      });
+
+      editor.addEventListener("keyup", () => {
+        saveState();
+      });
+
+      undoButton.addEventListener("click", () => {
+        undo();
+      });
+
+      redoButton.addEventListener("click", () => {
+        redo();
+      });
+
+      function updateRangeInfo() {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const rangeLength = range.toString().length;
+        const selectionStart = range.startOffset;
+        const selectionEnd = range.endOffset;
+        rangeInfo.textContent = `Selected Range: ${rangeLength} characters (${selectionStart} - ${selectionEnd})`;
+      }
+
+      function makeSelectedTextBold() {
+        document.execCommand("bold");
+        updateRangeInfo();
+        saveState();
+      }
+
+      function toggleItalic() {
+        document.execCommand("italic");
+        updateRangeInfo();
+        saveState();
+      }
+
+      function saveState() {
+        const newContent = editor.innerHTML;
+        if (newContent !== currentContent) {
+          undoStack.push(currentContent);
+          currentContent = newContent;
+          redoStack = [];
+        }
+      }
+
+      function undo() {
+        if (undoStack.length > 0) {
+          const currentState = undoStack.pop();
+          redoStack.push(currentContent);
+          currentContent = currentState;
+          editor.innerHTML = currentState;
+        }
+      }
+
+      function redo() {
+        if (redoStack.length > 0) {
+          const nextState = redoStack.pop();
+          undoStack.push(currentContent);
+          currentContent = nextState;sfgsgs
+          editor.innerHTML = nextState;
+        }
+      }
+    </script>
+  </body>
+</html>
