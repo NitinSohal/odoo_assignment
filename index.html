@@ -105,7 +105,7 @@
         if (redoStack.length > 0) {
           const nextState = redoStack.pop();
           undoStack.push(currentContent);
-          currentContent = nextState;sfgsgs
+          currentContent = nextState;
           editor.innerHTML = nextState;
         }
       }
